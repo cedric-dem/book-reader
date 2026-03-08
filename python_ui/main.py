@@ -151,7 +151,6 @@ class ReaderApp:
 		)
 
 	def on_close(self) -> None:
-		# logger.info("Window close requested")
 		self.cancel_word_update()
 		self.root.destroy()
 
@@ -184,7 +183,7 @@ class ReaderApp:
 		else:
 			if self.state.current_word_index < len(self.pages_list[self.state.current_page_index]):
 				word = self.pages_list[self.state.current_page_index][self.state.current_word_index]
-				# print("curent page : ",self.pages_list[self.state.current_page_index])
+				# print("current page : ",self.pages_list[self.state.current_page_index])
 				self.current_word.config(text = word)
 				# print(word)
 
@@ -197,7 +196,7 @@ class ReaderApp:
 					int(delay_seconds * 1000), self.update_word
 				)
 			else:
-				self.current_word.config(text = "finished page") #automatically go to the next page ?
+				self.current_word.config(text = "finished page")  # automatically go to the next page ?
 
 	def cancel_word_update(self) -> None:
 		if self.state.word_update_after_id is not None:
@@ -238,7 +237,6 @@ class ReaderApp:
 		self.menu_books_label.config(text = "\n".join(menu_lines))
 
 	def show_reader(self) -> None:
-		# logger.info("Switching to reader view")
 		if self.state.current_view == "reader":
 			return
 
@@ -391,4 +389,3 @@ if __name__ == "__main__":
 	ReaderApp(root)
 	root.mainloop()
 	root.mainloop()
-
