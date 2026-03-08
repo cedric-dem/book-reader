@@ -5,6 +5,7 @@ WORD_SIZE_REFERENCE = 5  # words longer than that will be displayed for longer
 OFFSET_DELAY_MS = 0.15  # constant offset
 DOT_DELAY = 2.0  # words ending with dot will take this as long
 COMMA_DELAY = 1.5  # words ending with comma will take this as long
+JUMP_WORDS_QTY = 10 #jump that amount when required
 
 BACKGROUND_COLOR = "#0F0F0F"
 

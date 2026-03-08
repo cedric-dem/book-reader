@@ -1,5 +1,12 @@
+import html
+import re
 import tkinter as tk
+import xml.etree.ElementTree as ET
+import zipfile
+import os
 from dataclasses import dataclass
+from html.parser import HTMLParser
+from pathlib import PurePosixPath
 
 from config import (
 	BACKGROUND_COLOR,
@@ -11,30 +18,105 @@ from config import (
 	SPEED_PERCENTAGE,
 	STEP_PERCENTAGE,
 	WORD_SIZE_REFERENCE,
+	JUMP_WORDS_QTY,
 )
 
-books = {
-	"lotr": ['This', 'book', 'is', 'largely', 'concerned', 'with', 'Hobbits,', 'and', 'from', 'its', 'pages', 'a', 'reader', 'may', 'discover', 'much', 'of', 'their', 'character', 'and', 'a', 'little', 'of', 'their', 'history.', 'Further', 'information', 'will', 'also', 'be', 'found', 'in', 'the',
-			 'selection', 'from', 'the', 'Red', 'Book', 'of', 'Westmarch', 'that', 'has', 'already', 'been', 'published,', 'under', 'the', 'title', 'of', 'The', 'Hobbit.', 'That', 'story', 'was', 'derived', 'from', 'the', 'earlier', 'chapters', 'of', 'the', 'Red', 'Book,', 'composed', 'by', 'Bilbo',
-			 'himself,', 'the', 'first', 'Hobbit', 'to', 'become', 'famous', 'in', 'the', 'world', 'at', 'large,', 'and', 'called', 'by', 'him', 'There', 'and', 'Back', 'Again,', 'since', 'they', 'told', 'of', 'his', 'journey', 'into', 'the', 'East', 'and', 'his', 'return:', 'an', 'adventure',
-			 'which', 'later', 'involved', 'all', 'the', 'Hobbits', 'in', 'the', 'great', 'events', 'of', 'that', 'Age', 'that', 'are', 'here', 'related.', 'Many,', 'however,', 'may', 'wish', 'to', 'know', 'more', 'about', 'this', 'remarkable', 'people', 'from', 'the', 'outset,', 'while', 'some',
-			 'may', 'not', 'possess', 'the', 'earlier', 'book.', 'For', 'such', 'readers', 'a', 'few', 'notes', 'on', 'the', 'more', 'important', 'points', 'are', 'here', 'collected', 'from', 'Hobbit-lore,', 'and', 'the', 'first', 'adventure', 'is', 'briefly', 'recalled.', 'Hobbits', 'are', 'an',
-			 'unobtrusive', 'but', 'very', 'ancient', 'people,', 'more', 'numerous', 'formerly', 'than', 'they', 'are', 'today;', 'for', 'they', 'love', 'peace', 'and', 'quiet', 'and', 'good', 'tilled', 'earth:', 'a', 'well-ordered', 'and', 'well-farmed', 'countryside', 'was', 'their', 'favourite',
-			 'haunt.',
-			 'They', 'do', 'not', 'and', 'did', 'not', 'understand', 'or', 'like', 'machines', 'more', 'complicated', 'than', 'a', 'forge-bellows,', 'a', 'water-mill,', 'or', 'a', 'hand-loom,', 'though', 'they', 'were', 'skilful', 'with', 'tools.', 'Even', 'in', 'ancient', 'days', 'they', 'were,',
-			 'as', 'a', 'rule,', 'shy', 'of', '‘the', 'Big', 'Folk’,', 'as', 'they', 'call', 'us,', 'and', 'now', 'they', 'avoid', 'us', 'with', 'dismay', 'and', 'are', 'becoming', 'hard', 'to', 'find.', 'They', 'are', 'quick', 'of', 'hearing', 'and', 'sharp-eyed,', 'and', 'though', 'they', 'are',
-			 'inclined', 'to', 'be', 'fat', 'and', 'do', 'not', 'hurry', 'unnecessarily,', 'they', 'are', 'nonetheless', 'nimble', 'and', 'deft', 'in', 'their', 'movements.', 'They', 'possessed', 'from', 'the', 'first', 'the', 'art', 'of', 'disappearing', 'swiftly', 'and', 'silently,', 'when',
-			 'large', 'folk',
-			 'whom', 'they', 'do', 'not', 'wish', 'to', 'meet', 'come', 'blundering', 'by;', 'and', 'this', 'art', 'they', 'have', 'developed', 'until', 'to', 'Men', 'it', 'may', 'seem', 'magical.', 'But', 'Hobbits', 'have', 'never,', 'in', 'fact,', 'studied', 'magic', 'of', 'any', 'kind,', 'and',
-			 'their', 'elusiveness', 'is', 'due', 'solely', 'to', 'a', 'professional', 'skill', 'that', 'heredity', 'and', 'practice,', 'and', 'a', 'close', 'friendship', 'with', 'the', 'earth,', 'have', 'rendered', 'inimitable', 'by', 'bigger', 'and', 'clumsier', 'races.'],
-	"test_1": ["this", "is", "the", "second", "book"],
-	"test_2": ["this", "is", "the", "third", "book"]
-}
+class _TextExtractor(HTMLParser):
+	def __init__(self) -> None:
+		super().__init__()
+		self.parts: list[str] = []
+
+	def handle_data(self, data: str) -> None:
+		cleaned = data.strip()
+		if cleaned:
+			self.parts.append(cleaned)
+
+"""
+def read_epub_file(epub_path):
+	with zipfile.ZipFile(epub_path, 'r') as epub:
+		full_book = []
+		for file in epub.namelist():
+			this_pages_text_content = []
+			if file.endswith(('.html', '.xhtml', '.htm')):
+				with epub.open(file) as f:
+					content = f.read().decode('utf-8', errors = 'ignore')
+
+					# Remove HTML tags
+					clean_text = re.sub(r'<[^>]+>', ' ', content)
+
+					this_pages_text_content.append(clean_text)
+
+			# Combine all text
+			full_text = " ".join(this_pages_text_content)
+
+			# Extract words
+			words = re.findall(r'\b\w+\b', full_text)
+			all_text_page_joined = " ".join(words)
+			full_book.append(all_text_page_joined)
+
+		return full_book
+"""
+
+def read_epub_file(epub_file_path: str) -> list[list[str]]:
+	with zipfile.ZipFile(epub_file_path) as epub_zip:
+		container_xml = ET.fromstring(epub_zip.read("META-INF/container.xml"))
+		rootfile_path = container_xml.find(
+			".//{urn:oasis:names:tc:opendocument:xmlns:container}rootfile"
+		)
+
+		if rootfile_path is None:
+			raise ValueError("EPUB package file not found")
+
+		package_path = rootfile_path.attrib.get("full-path", "")
+		package_dir = PurePosixPath(package_path).parent
+		package_xml = ET.fromstring(epub_zip.read(package_path))
+
+		namespace = {"opf": "http://www.idpf.org/2007/opf"}
+		manifest_by_id = {
+			item.attrib["id"]: item.attrib["href"]
+			for item in package_xml.findall(".//opf:manifest/opf:item", namespace)
+			if item.attrib.get("id") and item.attrib.get("href")
+		}
+
+		pages: list[list[str]] = []
+		for item_ref in package_xml.findall(".//opf:spine/opf:itemref", namespace):
+			item_id = item_ref.attrib.get("idref")
+			if not item_id or item_id not in manifest_by_id:
+				continue
+
+			chapter_path = package_dir / manifest_by_id[item_id]
+			chapter_text = epub_zip.read(str(chapter_path)).decode("utf-8", errors = "ignore")
+			chapter_text = re.sub(r"<[^>]+>", " ", chapter_text)
+			chapter_text = html.unescape(chapter_text)
+			words = re.findall(r"\S+", chapter_text)
+
+			pages.append(words)
+
+		return pages
+
+def get_books_list() -> list[str]:
+	books_list = os.listdir("books")
+	books_list.sort()
+	return books_list
+
+def analyze_all_books():
+	L = get_books_list()
+	for book in L:
+		print("=> Current book", book)
+		this = read_epub_file("books/" + book)
+
+		sizes = []
+		for page in this:
+			sizes.append(len(page))
+		sizes.sort()
+		print("===> nb pages : ", len(this))  # , " page sizes ", sizes)
 
 @dataclass
 class ReaderState:
-	current_book: str = "lotr"
+	current_book: str = "lord_of_the_rings.epub"
+	selected_book_index: int = 0
 	current_word_index: int = 0
+	current_page_index: int = 0
 	current_view: str = "menu"
 	word_update_after_id: str | None = None
 	speed_percentage: int = SPEED_PERCENTAGE
@@ -43,7 +125,8 @@ class ReaderApp:
 	def __init__(self, root: tk.Tk) -> None:
 		self.root = root
 		self.state = ReaderState()
-		self.words = books[self.state.current_book]
+		self.pages_list = read_epub_file("books/" + self.state.current_book)
+		self.books_list = get_books_list()
 
 		self.root.title("Word Reader")
 		self.root.geometry(f"{SCREEN_SIZE[0]}x{SCREEN_SIZE[1]}")
@@ -54,11 +137,11 @@ class ReaderApp:
 
 		self.menu_title_label = tk.Label(root, text = "Menu", font = ("Arial", 32, "bold"), bg = BACKGROUND_COLOR, fg = "white", )
 
-		self.menu_instructions_label = tk.Label(root, text = "Press 'j' for lotr, 'k' for test_1, 'l' for test_2\nPress '9' while reading to return here", font = ("Arial", 16), justify = "center", bg = BACKGROUND_COLOR, fg = "white", )
+		self.menu_instructions_label = tk.Label(root, text = "Use 'u' and 'd' to move in the list\nPress 'o' to open selected book\nPress '9' while reading to return here", font = ("Arial", 16), justify = "center", bg = BACKGROUND_COLOR, fg = "white", )
+
+		self.menu_books_label = tk.Label(root, text = "", font = ("Arial", 18), justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
 
 		self.page_progression_label = tk.Label(root, text = "This page progression :\n308 / 1099 words", font = ("Arial", 14), anchor = "w", justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
-
-		self.current_chapter_label = tk.Label(root, text = "Current chapter:\n1 / 12", font = ("Arial", 14), anchor = "center", justify = "center", bg = BACKGROUND_COLOR, fg = "white", )
 
 		self.book_progression_label = tk.Label(root, text = "Book progression :\n12 / 500 pages ", font = ("Arial", 14), anchor = "e", justify = "right", bg = BACKGROUND_COLOR, fg = "white", )
 
@@ -67,7 +150,38 @@ class ReaderApp:
 		self.speed_label = tk.Label(root, text = "Delay :\n100 %", font = ("Arial", 14), anchor = "e", justify = "right", bg = BACKGROUND_COLOR, fg = "white", )
 
 		self.root.bind("<Key>", self.key_pressed)
+		self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+
 		self.show_menu()
+
+	def update_page_progression_label(self) -> None:
+		if not self.pages_list:
+			self.page_progression_label.config(text = "This page progression:\n0 / 0 words")
+			return
+
+		current_page_words = self.pages_list[self.state.current_page_index]
+		total_words = len(current_page_words)
+		current_word = min(self.state.current_word_index, total_words)
+		self.page_progression_label.config(
+			text = f"This page progression:\n{current_word} / {total_words} words"
+		)
+
+	def update_book_progression_label(self) -> None:
+		total_pages = len(self.pages_list)
+
+		if total_pages == 0:
+			self.book_progression_label.config(text = "Book progression:\n0 / 0 pages")
+			return
+
+		current_page = min(self.state.current_page_index + 1, total_pages)
+		self.book_progression_label.config(
+			text = f"Book progression:\n{current_page} / {total_pages} pages"
+		)
+
+	def on_close(self) -> None:
+		# logger.info("Window close requested")
+		self.cancel_word_update()
+		self.root.destroy()
 
 	def update_speed_label(self) -> None:
 		self.speed_label.config(text = f"Delay : {self.state.speed_percentage:.0f}%")
@@ -90,15 +204,28 @@ class ReaderApp:
 		)
 
 	def update_word(self) -> None:
-		word = self.words[self.state.current_word_index]
-		self.current_word.config(text = word)
+		self.update_page_progression_label()
 
-		delay_seconds = self.calculate_delay_seconds(word)
-		self.state.current_word_index = (self.state.current_word_index + 1) % len(self.words)
+		if len(self.pages_list[self.state.current_page_index]) == 0:
+			self.current_word.config(text = "empty page")  # todo change this
 
-		self.state.word_update_after_id = self.root.after(
-			int(delay_seconds * 1000), self.update_word
-		)
+		else:
+			if self.state.current_word_index < len(self.pages_list[self.state.current_page_index]):
+				word = self.pages_list[self.state.current_page_index][self.state.current_word_index]
+				# print("curent page : ",self.pages_list[self.state.current_page_index])
+				self.current_word.config(text = word)
+				# print(word)
+
+				delay_seconds = self.calculate_delay_seconds(word)
+
+				self.state.current_word_index = (self.state.current_word_index + 1)
+				self.update_page_progression_label()
+
+				self.state.word_update_after_id = self.root.after(
+					int(delay_seconds * 1000), self.update_word
+				)
+			else:
+				self.current_word.config(text = "finished page")
 
 	def cancel_word_update(self) -> None:
 		if self.state.word_update_after_id is not None:
@@ -110,11 +237,11 @@ class ReaderApp:
 		self.cancel_word_update()
 
 		self.current_word.place_forget()
-		self.current_chapter_label.place_forget()
 		self.page_progression_label.place_forget()
 		self.book_progression_label.place_forget()
 		self.battery_label.place_forget()
 		self.speed_label.place_forget()
+		self.update_menu_books_label()
 
 		self.menu_title_label.place(
 			x = int(0.24 * SCREEN_SIZE[0]),
@@ -128,14 +255,31 @@ class ReaderApp:
 			width = int(0.76 * SCREEN_SIZE[0]),
 			height = int(0.20 * SCREEN_SIZE[1]),
 		)
+		self.menu_books_label.place(
+			x = int(0.26 * SCREEN_SIZE[0]),
+			y = int(0.66 * SCREEN_SIZE[1]),
+			width = int(0.48 * SCREEN_SIZE[0]),
+			height = int(0.24 * SCREEN_SIZE[1]),
+		)
+
+	def update_menu_books_label(self) -> None:
+		menu_lines: list[str] = []
+
+		for index, book_name in enumerate(self.books_list):
+			prefix = ">" if index == self.state.selected_book_index else " "
+			menu_lines.append(f"{prefix} {book_name}")
+
+		self.menu_books_label.config(text = "\n".join(menu_lines))
 
 	def show_reader(self) -> None:
+		# logger.info("Switching to reader view")
 		if self.state.current_view == "reader":
 			return
 
 		self.state.current_view = "reader"
 		self.menu_title_label.place_forget()
 		self.menu_instructions_label.place_forget()
+		self.menu_books_label.place_forget()
 
 		self.current_word.place(
 			x = int(0 * SCREEN_SIZE[0]),
@@ -147,12 +291,6 @@ class ReaderApp:
 			x = int(0.02 * SCREEN_SIZE[0]),
 			y = int(0.02 * SCREEN_SIZE[1]),
 			width = int(0.36 * SCREEN_SIZE[0]),
-			height = int(0.09 * SCREEN_SIZE[1]),
-		)
-		self.current_chapter_label.place(
-			x = int(0.30 * SCREEN_SIZE[0]),
-			y = int(0.02 * SCREEN_SIZE[1]),
-			width = int(0.40 * SCREEN_SIZE[0]),
 			height = int(0.09 * SCREEN_SIZE[1]),
 		)
 		self.book_progression_label.place(
@@ -177,13 +315,12 @@ class ReaderApp:
 		self.update_word()
 
 	def select_book(self, book_name: str) -> None:
-		if book_name not in books:
-			print(f"Unknown book: {book_name}")
-			return
 
 		self.state.current_book = book_name
-		self.words = books[book_name]
+		self.pages_list = read_epub_file("books/" + book_name)
 		self.state.current_word_index = 0
+		self.state.current_page_index = 0
+		self.update_book_progression_label()
 		self.show_reader()
 		print(f"Opening book: {book_name}")
 
@@ -205,38 +342,88 @@ class ReaderApp:
 		key = event.char.lower()
 
 		if self.state.current_view == "menu":
-			if key == "j":
-				self.select_book("lotr")
-			elif key == "k":
-				self.select_book("test_1")
-			elif key == "l":
-				self.select_book("test_2")
+			self.key_press_menu(key)
 			return
 
+		else:
+			self.key_press_book(key)
+			return
+
+	def key_press_menu(self, key: str) -> None:
+		if key == "1":
+			self.state.selected_book_index = (self.state.selected_book_index - 1) % len(self.books_list)
+			self.update_menu_books_label()
+		elif key == "2":
+			self.state.selected_book_index = (self.state.selected_book_index + 1) % len(self.books_list)
+			self.update_menu_books_label()
+		elif key == "3":
+			book_name = get_books_list()[self.state.selected_book_index]
+			self.select_book(book_name)
+
+	def key_press_book(self, key: str) -> None:
 		if key == "1":
 			self.update_speed(increase = False)
+
 		elif key == "2":
 			self.update_speed(increase = True)
+
 		elif key == "3":
 			print("Previous page")
+			self.cancel_word_update()
+			self.state.current_word_index = 0
+			if self.state.current_page_index > 0:
+				self.state.current_page_index -= 1
+			else:
+				print("Page is already 0")
+			self.update_word()
+			self.update_book_progression_label()
+
 		elif key == "4":
 			print("Next page")
+			self.cancel_word_update()
+			self.state.current_word_index = 0
+			if self.state.current_page_index < len(self.pages_list) - 1:
+				self.state.current_page_index += 1
+			else:
+				print("Page is max")
+			self.update_word()
+			self.update_book_progression_label()
+
 		elif key == "5":
-			print("Go back 10 words")
+			if self.state.current_word_index > JUMP_WORDS_QTY:
+				self.state.current_word_index -= JUMP_WORDS_QTY
+				print("Go back " + str(JUMP_WORDS_QTY) + " words, now at ",self.state.current_word_index)
+			else:
+				print("Too early on the page (word", str(self.state.current_word_index), ") to jump", JUMP_WORDS_QTY, " words back")
+
 		elif key == "6":
-			print("Jump 10 words")
+			if self.state.current_word_index + JUMP_WORDS_QTY < len(self.pages_list[self.state.current_page_index]):
+				self.state.current_word_index += JUMP_WORDS_QTY
+				print("Jump " + str(JUMP_WORDS_QTY) + " words, now at ",self.state.current_word_index)
+			else:
+				print("Too late on the page (word", str(self.state.current_word_index), ") to jump", JUMP_WORDS_QTY, " words back")
+
 		elif key == "7":
 			print("Pause")
+
 		elif key == "8":
 			print("Switch View")
+
 		elif key == "9":
 			self.show_menu()
 			print("Home")
 
 def main() -> None:
-	root = tk.Tk()
+	try:
+		root = tk.Tk()
+	except tk.TclError as error:
+		print("Tkinter could not start. If you're on Linux without a desktop, check DISPLAY/X11 setup.")
+		raise SystemExit(1) from error
+
 	ReaderApp(root)
+	root.mainloop()
 	root.mainloop()
 
 if __name__ == "__main__":
+	analyze_all_books()
 	main()
