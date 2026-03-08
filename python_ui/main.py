@@ -87,7 +87,7 @@ def analyze_all_books():
 
 @dataclass
 class ReaderState:
-	current_book: str = "lord_of_the_rings.epub"
+	current_book: str = "La bible.epub"
 	selected_book_index: int = 0
 	current_word_index: int = 0
 	current_page_index: int = 0
@@ -111,9 +111,7 @@ class ReaderApp:
 
 		self.menu_title_label = tk.Label(root, text = "Menu", font = ("Arial", 32, "bold"), bg = BACKGROUND_COLOR, fg = "white", )
 
-		self.menu_instructions_label = tk.Label(root, text = "Use 'u' and 'd' to move in the list\nPress 'o' to open selected book\nPress '9' while reading to return here", font = ("Arial", 16), justify = "center", bg = BACKGROUND_COLOR, fg = "white", )
-
-		self.menu_books_label = tk.Label(root, text = "", font = ("Arial", 18), justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
+		self.menu_books_label = tk.Label(root, text = "", font = ("Arial", 14), justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
 
 		self.page_progression_label = tk.Label(root, text = "This page progression :\n", font = ("Arial", 14), anchor = "w", justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
 
@@ -218,22 +216,16 @@ class ReaderApp:
 		self.update_menu_books_label()
 
 		self.menu_title_label.place(
-			x = int(0.24 * SCREEN_SIZE[0]),
-			y = int(0.28 * SCREEN_SIZE[1]),
-			width = int(0.52 * SCREEN_SIZE[0]),
-			height = int(0.08 * SCREEN_SIZE[1]),
-		)
-		self.menu_instructions_label.place(
-			x = int(0.12 * SCREEN_SIZE[0]),
-			y = int(0.44 * SCREEN_SIZE[1]),
-			width = int(0.76 * SCREEN_SIZE[0]),
-			height = int(0.20 * SCREEN_SIZE[1]),
+			x = int(0.1 * SCREEN_SIZE[0]),
+			y = int(0.05 * SCREEN_SIZE[1]),
+			width = int(0.8 * SCREEN_SIZE[0]),
+			height = int(0.05 * SCREEN_SIZE[1]),
 		)
 		self.menu_books_label.place(
-			x = int(0.26 * SCREEN_SIZE[0]),
-			y = int(0.66 * SCREEN_SIZE[1]),
-			width = int(0.48 * SCREEN_SIZE[0]),
-			height = int(0.24 * SCREEN_SIZE[1]),
+			x = int(0.05 * SCREEN_SIZE[0]),
+			y = int(0.15 * SCREEN_SIZE[1]),
+			width = int(0.9 * SCREEN_SIZE[0]),
+			height = int(0.8 * SCREEN_SIZE[1]),
 		)
 
 	def update_menu_books_label(self) -> None:
@@ -252,7 +244,6 @@ class ReaderApp:
 
 		self.state.current_view = "reader"
 		self.menu_title_label.place_forget()
-		self.menu_instructions_label.place_forget()
 		self.menu_books_label.place_forget()
 
 		self.current_word.place(
