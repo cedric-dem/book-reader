@@ -8,5 +8,6 @@ COMMA_DELAY = 1.5  # words ending with comma will take this as long
 JUMP_WORDS_QTY = 10 #jump that amount when required
 
 BACKGROUND_COLOR = "#0F0F0F"
+BOOK_PROGRESSION_FILE = "book_progression.pkl"
 
 SCREEN_SIZE = (700, 700)

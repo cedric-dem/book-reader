@@ -7,6 +7,7 @@ import os
 from dataclasses import dataclass
 from html.parser import HTMLParser
 from pathlib import PurePosixPath
+import pickle
 
 from config import (
 	BACKGROUND_COLOR,
@@ -18,7 +19,7 @@ from config import (
 	SPEED_PERCENTAGE,
 	STEP_PERCENTAGE,
 	WORD_SIZE_REFERENCE,
-	JUMP_WORDS_QTY,
+	JUMP_WORDS_QTY, BOOK_PROGRESSION_FILE,
 )
 
 class _TextExtractor(HTMLParser):
@@ -94,6 +95,28 @@ class ReaderState:
 	current_view: str = "menu"
 	word_update_after_id: str | None = None
 	speed_percentage: int = SPEED_PERCENTAGE
+
+def load_state_if_any():
+	print("=> load prog")
+	if os.path.exists(BOOK_PROGRESSION_FILE):
+		with open(BOOK_PROGRESSION_FILE, "rb") as f:
+			data = pickle.load(f)
+			return data
+	else:
+		return {}
+
+def save_current_state(current_book, current_page_index, current_word_index):
+	print("=> save prog")
+	current_state = load_state_if_any()
+
+	# add current book
+	current_state[current_book] = {"current_page_index": current_page_index, "current_word_index": current_word_index}
+
+	# print("===> keys current", current_state)
+
+	# save progression
+	with open(BOOK_PROGRESSION_FILE, "wb") as f:
+		pickle.dump(current_state, f)
 
 class ReaderApp:
 	def __init__(self, root: tk.Tk) -> None:
@@ -282,8 +305,15 @@ class ReaderApp:
 		self.state.current_book = book_name
 		self.pages_list = read_epub_file("books/" + book_name)
 		self.update_speed_label()
-		self.state.current_word_index = 0
-		self.state.current_page_index = 0
+
+		whole_state = load_state_if_any()
+		if self.state.current_book in whole_state:
+			self.state.current_word_index = whole_state[self.state.current_book]["current_word_index"]
+			self.state.current_page_index = whole_state[self.state.current_book]["current_page_index"]
+		else:
+			self.state.current_word_index = 0
+			self.state.current_page_index = 0
+
 		self.update_book_progression_label()
 		self.show_reader()
 		print(f"Opening book: {book_name}")
@@ -374,6 +404,7 @@ class ReaderApp:
 			print("Switch View")
 
 		elif key == "9":
+			save_current_state(self.state.current_book, self.state.current_page_index, self.state.current_word_index)
 			self.show_menu()
 			print("Home")
 
