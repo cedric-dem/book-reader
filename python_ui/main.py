@@ -31,32 +31,6 @@ class _TextExtractor(HTMLParser):
 		if cleaned:
 			self.parts.append(cleaned)
 
-"""
-def read_epub_file(epub_path):
-	with zipfile.ZipFile(epub_path, 'r') as epub:
-		full_book = []
-		for file in epub.namelist():
-			this_pages_text_content = []
-			if file.endswith(('.html', '.xhtml', '.htm')):
-				with epub.open(file) as f:
-					content = f.read().decode('utf-8', errors = 'ignore')
-
-					# Remove HTML tags
-					clean_text = re.sub(r'<[^>]+>', ' ', content)
-
-					this_pages_text_content.append(clean_text)
-
-			# Combine all text
-			full_text = " ".join(this_pages_text_content)
-
-			# Extract words
-			words = re.findall(r'\b\w+\b', full_text)
-			all_text_page_joined = " ".join(words)
-			full_book.append(all_text_page_joined)
-
-		return full_book
-"""
-
 def read_epub_file(epub_file_path: str) -> list[list[str]]:
 	with zipfile.ZipFile(epub_file_path) as epub_zip:
 		container_xml = ET.fromstring(epub_zip.read("META-INF/container.xml"))
@@ -141,13 +115,13 @@ class ReaderApp:
 
 		self.menu_books_label = tk.Label(root, text = "", font = ("Arial", 18), justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
 
-		self.page_progression_label = tk.Label(root, text = "This page progression :\n308 / 1099 words", font = ("Arial", 14), anchor = "w", justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
+		self.page_progression_label = tk.Label(root, text = "This page progression :\n", font = ("Arial", 14), anchor = "w", justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
 
-		self.book_progression_label = tk.Label(root, text = "Book progression :\n12 / 500 pages ", font = ("Arial", 14), anchor = "e", justify = "right", bg = BACKGROUND_COLOR, fg = "white", )
+		self.book_progression_label = tk.Label(root, text = "Book progression :\n ", font = ("Arial", 14), anchor = "e", justify = "right", bg = BACKGROUND_COLOR, fg = "white", )
 
 		self.battery_label = tk.Label(root, text = "Battery :\n36 %", font = ("Arial", 14), anchor = "w", justify = "left", bg = BACKGROUND_COLOR, fg = "white", )
 
-		self.speed_label = tk.Label(root, text = "Delay :\n100 %", font = ("Arial", 14), anchor = "e", justify = "right", bg = BACKGROUND_COLOR, fg = "white", )
+		self.speed_label = tk.Label(root, text = "Delay :\n", font = ("Arial", 14), anchor = "e", justify = "right", bg = BACKGROUND_COLOR, fg = "white", )
 
 		self.root.bind("<Key>", self.key_pressed)
 		self.root.protocol("WM_DELETE_WINDOW", self.on_close)
@@ -184,7 +158,7 @@ class ReaderApp:
 		self.root.destroy()
 
 	def update_speed_label(self) -> None:
-		self.speed_label.config(text = f"Delay : {self.state.speed_percentage:.0f}%")
+		self.speed_label.config(text = f"Delay :\n{self.state.speed_percentage:.0f}%")
 
 	def calculate_delay_seconds(self, word: str) -> float:
 		word_size_coefficient = len(word) / WORD_SIZE_REFERENCE
@@ -225,7 +199,7 @@ class ReaderApp:
 					int(delay_seconds * 1000), self.update_word
 				)
 			else:
-				self.current_word.config(text = "finished page")
+				self.current_word.config(text = "finished page") #automatically go to the next page ?
 
 	def cancel_word_update(self) -> None:
 		if self.state.word_update_after_id is not None:
@@ -318,6 +292,7 @@ class ReaderApp:
 
 		self.state.current_book = book_name
 		self.pages_list = read_epub_file("books/" + book_name)
+		self.update_speed_label()
 		self.state.current_word_index = 0
 		self.state.current_page_index = 0
 		self.update_book_progression_label()
@@ -392,14 +367,14 @@ class ReaderApp:
 		elif key == "5":
 			if self.state.current_word_index > JUMP_WORDS_QTY:
 				self.state.current_word_index -= JUMP_WORDS_QTY
-				print("Go back " + str(JUMP_WORDS_QTY) + " words, now at ",self.state.current_word_index)
+				print("Go back " + str(JUMP_WORDS_QTY) + " words, now at ", self.state.current_word_index)
 			else:
 				print("Too early on the page (word", str(self.state.current_word_index), ") to jump", JUMP_WORDS_QTY, " words back")
 
 		elif key == "6":
 			if self.state.current_word_index + JUMP_WORDS_QTY < len(self.pages_list[self.state.current_page_index]):
 				self.state.current_word_index += JUMP_WORDS_QTY
-				print("Jump " + str(JUMP_WORDS_QTY) + " words, now at ",self.state.current_word_index)
+				print("Jump " + str(JUMP_WORDS_QTY) + " words, now at ", self.state.current_word_index)
 			else:
 				print("Too late on the page (word", str(self.state.current_word_index), ") to jump", JUMP_WORDS_QTY, " words back")
 
@@ -413,7 +388,9 @@ class ReaderApp:
 			self.show_menu()
 			print("Home")
 
-def main() -> None:
+if __name__ == "__main__":
+	analyze_all_books()
+
 	try:
 		root = tk.Tk()
 	except tk.TclError as error:
@@ -424,6 +401,3 @@ def main() -> None:
 	root.mainloop()
 	root.mainloop()
 
-if __name__ == "__main__":
-	analyze_all_books()
-	main()
