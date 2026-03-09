@@ -32,3 +32,5 @@ gui:
 		word
 		battery
 		speed %
+
+	only on andoid app : 	create bookmark ?

@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_go_home"
+            android:foreground="@drawable/icon_home"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="@color/reading_button_gray"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/button_dark_mode"
+            android:foreground="@drawable/icon_dark_mode"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="@color/reading_button_gray"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/button_switch_view"
+            android:foreground="@drawable/icon_switch_view"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="@color/reading_button_gray"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/button_play_pause"
+            android:foreground="@drawable/icon_play_pause"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="@color/reading_button_gray"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_book_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="word will be here"
+        android:textColor="@color/white"
+        android:textSize="24sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_decrease_speed"
+                android:foreground="@drawable/icon_arrow_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/reading_button_gray"
+                android:textColor="@color/white" />
+
+            <ImageView
+                android:id="@+id/icon_view_speed"
+                android:src="@drawable/icon_reading_speed"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/button_increase_speed"
+                android:foreground="@drawable/icon_arrow_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/reading_button_gray"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/text_current_speed"
+                android:text="Reading speed :\n10%"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_previous_page"
+                android:foreground="@drawable/icon_arrow_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/reading_button_gray"
+                android:textColor="@color/white" />
+
+            <ImageView
+                android:id="@+id/icon_view_page"
+                android:src="@drawable/icon_page"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/button_next_page"
+                android:foreground="@drawable/icon_arrow_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/reading_button_gray"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/text_current_page"
+                android:text="Page :\n120 / 333"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_rewind_word"
+                android:foreground="@drawable/icon_arrow_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/reading_button_gray"
+                android:textColor="@color/white" />
+
+            <ImageView
+                android:id="@+id/icon_view_word"
+                android:src="@drawable/word"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/button_jump_words"
+                android:foreground="@drawable/icon_arrow_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/reading_button_gray"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/text_current_words"
+                android:text="Words :\n42 / 66"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/button_save_bookmark"
+                android:foreground="@drawable/icon_save"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/reading_button_gray"
+                android:textColor="@color/white" />
+
+            <ImageView
+                android:id="@+id/icon_view_bookmark"
+                android:src="@drawable/icon_bookmark"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/button_load_bookmark"
+                android:foreground="@drawable/icon_load"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:backgroundTint="@color/reading_button_gray"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/text_current_bookmark"
+                android:text="Bookmarks :\n3"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+</LinearLayout>

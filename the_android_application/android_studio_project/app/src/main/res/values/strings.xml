@@ -4,4 +4,8 @@
     <string name="no_epub_selected">No EPUB selected</string>
     <string name="selected_epub">Selected: %1$s</string>
     <string name="epub_pick_cancelled">No file selected</string>
+    <string name="reading_preview_title">First 100 words</string>
+    <string name="no_preview_available">No preview available</string>
+    <string name="epub_read_error">Could not read this EPUB file</string>
+    <string name="epub_no_text_found">No readable text found in this EPUB</string>
 </resources>
