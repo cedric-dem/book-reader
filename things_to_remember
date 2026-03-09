@@ -1,0 +1,34 @@
+todo : 
+	both android and python : 
+		switch from delay to speed, more natural
+		swspeed percentage should be speeed_coefficient, initialized ad 1.0, step of like 0.1
+
+	only android:
+		implement many things like 
+			bookmarks
+			save state
+			correct menu
+			dark theme
+			pause play
+			view mode
+			
+physical object using python :
+	speaker for current word ? and/or page turn
+
+	top:
+		switch view - switch from word by word to full page
+
+	left : 
+		home
+		on/off
+
+	right:
+		- speed
+		+ speed
+
+	bottom:
+		go back 1 page
+		go back 10 words
+		pause
+		go forward 10 words
+		go forward 1 page

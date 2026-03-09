@@ -2,6 +2,7 @@ package com.fluffycactus.wordperwordreader
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -10,6 +11,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import java.io.InputStream
+import java.io.Serializable
 import java.util.zip.ZipInputStream
 
 class MainActivity : ComponentActivity() {
@@ -24,9 +26,12 @@ class MainActivity : ComponentActivity() {
                 Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
 
-            val firstWords = extractFirstWordsFromEpub(uri, 100)
+            val chapterPagesWords = extractChapterPagesFromEpub(uri)
+
+            // Log.d("MainActivity","Passing data to ActivityReadingBook - chapters/pages=${chapterPagesWords.size}, firstElementSize=${chapterPagesWords.firstOrNull()?.size ?: 0}")
+
             val readingIntent = Intent(this, ActivityReadingBook::class.java).apply {
-                putExtra(ActivityReadingBook.EXTRA_PREVIEW_TEXT, firstWords)
+                putExtra(ActivityReadingBook.EXTRA_CHAPTER_PAGES_WORDS, ArrayList(chapterPagesWords) as Serializable)
             }
             startActivity(readingIntent)
         } else {
@@ -47,22 +52,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun extractFirstWordsFromEpub(uri: Uri, maxWords: Int): String {
+    private fun extractChapterPagesFromEpub(uri: Uri): List<List<String>> {
         return try {
             contentResolver.openInputStream(uri)?.use { inputStream ->
-                extractWordsFromStream(inputStream, maxWords)
-            } ?: getString(R.string.epub_read_error)
+                extractWordsByChapterPageFromStream(inputStream)
+            } ?: emptyList()
         } catch (_: Exception) {
-            getString(R.string.epub_read_error)
+            emptyList()
         }
     }
 
-    private fun extractWordsFromStream(inputStream: InputStream, maxWords: Int): String {
-        val words = mutableListOf<String>()
+    private fun extractWordsByChapterPageFromStream(inputStream: InputStream): List<List<String>> {
+        val chapterPagesWords = mutableListOf<List<String>>()
 
         ZipInputStream(inputStream).use { zip ->
             var entry = zip.nextEntry
-            while (entry != null && words.size < maxWords) {
+            while (entry != null) {
                 val entryName = entry.name.lowercase()
                 if (!entry.isDirectory && (entryName.endsWith(".xhtml") || entryName.endsWith(".html") || entryName.endsWith(".htm"))) {
                     val rawText = zip.readBytes().toString(Charsets.UTF_8)
@@ -70,20 +75,19 @@ class MainActivity : ComponentActivity() {
                         .replace(Regex("<[^>]+>"), " ")
                         .replace(Regex("&[a-zA-Z#0-9]+;"), " ")
 
-                    cleanedText
+                    val words = cleanedText
                         .split(Regex("\\s+"))
                         .filter { it.isNotBlank() }
-                        .forEach { word ->
-                            if (words.size < maxWords) {
-                                words.add(word)
-                            }
-                        }
+
+                    if (words.isNotEmpty()) {
+                        chapterPagesWords.add(words)
+                    }
                 }
                 zip.closeEntry()
                 entry = zip.nextEntry
             }
         }
 
-        return if (words.isEmpty()) getString(R.string.epub_no_text_found) else words.joinToString(" ")
+        return chapterPagesWords
     }
 }

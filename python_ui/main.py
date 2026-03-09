@@ -16,7 +16,6 @@ from config import (
 	GENERAL_DELAY,
 	OFFSET_DELAY_MS,
 	SCREEN_SIZE,
-	SPEED_PERCENTAGE,
 	STEP_PERCENTAGE,
 	WORD_SIZE_REFERENCE,
 	JUMP_WORDS_QTY, BOOK_PROGRESSION_FILE,
@@ -95,7 +94,7 @@ class ReaderState:
 	current_view: str = "menu"
 	is_paused: bool = False
 	word_update_after_id: str | None = None
-	speed_percentage: int = SPEED_PERCENTAGE
+	speed_percentage: int = 100
 
 def load_state_if_any():
 	print("=> load prog")

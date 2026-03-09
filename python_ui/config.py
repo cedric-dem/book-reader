@@ -1,4 +1,3 @@
-SPEED_PERCENTAGE = 100  # initially 100% of the speed
 GENERAL_DELAY = 0.15  # initial delay for 100% speed and word size reference
 STEP_PERCENTAGE = 10  # percentage granularity of speed setting
 WORD_SIZE_REFERENCE = 5  # words longer than that will be displayed for longer
