@@ -93,6 +93,7 @@ class ReaderState:
 	current_word_index: int = 0
 	current_page_index: int = 0
 	current_view: str = "menu"
+	is_paused: bool = False
 	word_update_after_id: str | None = None
 	speed_percentage: int = SPEED_PERCENTAGE
 
@@ -198,6 +199,9 @@ class ReaderApp:
 		)
 
 	def update_word(self) -> None:
+		if self.state.is_paused:
+			return
+
 		self.update_page_progression_label()
 
 		if len(self.pages_list[self.state.current_page_index]) == 0:
@@ -264,6 +268,7 @@ class ReaderApp:
 			return
 
 		self.state.current_view = "reader"
+		self.state.is_paused = False
 		self.menu_title_label.place_forget()
 		self.menu_books_label.place_forget()
 
@@ -361,7 +366,7 @@ class ReaderApp:
 		elif key == "2":
 			self.update_speed(increase = True)
 
-		elif key == "3":
+		elif key == "4":
 			print("Previous page")
 			self.cancel_word_update()
 			self.state.current_word_index = 0
@@ -372,7 +377,7 @@ class ReaderApp:
 			self.update_word()
 			self.update_book_progression_label()
 
-		elif key == "4":
+		elif key == "5":
 			print("Next page")
 			self.cancel_word_update()
 			self.state.current_word_index = 0
@@ -383,25 +388,29 @@ class ReaderApp:
 			self.update_word()
 			self.update_book_progression_label()
 
-		elif key == "5":
+		elif key == "7":
 			if self.state.current_word_index > JUMP_WORDS_QTY:
 				self.state.current_word_index -= JUMP_WORDS_QTY
 				print("Go back " + str(JUMP_WORDS_QTY) + " words, now at ", self.state.current_word_index)
 			else:
 				print("Too early on the page (word", str(self.state.current_word_index), ") to jump", JUMP_WORDS_QTY, " words back")
 
-		elif key == "6":
+		elif key == "8":
 			if self.state.current_word_index + JUMP_WORDS_QTY < len(self.pages_list[self.state.current_page_index]):
 				self.state.current_word_index += JUMP_WORDS_QTY
 				print("Jump " + str(JUMP_WORDS_QTY) + " words, now at ", self.state.current_word_index)
 			else:
 				print("Too late on the page (word", str(self.state.current_word_index), ") to jump", JUMP_WORDS_QTY, " words back")
 
-		elif key == "7":
+		elif key == "0":
 			print("Pause")
-
-		elif key == "8":
-			print("Switch View")
+			self.state.is_paused = not self.state.is_paused
+			if self.state.is_paused:
+				self.cancel_word_update()
+				print("Pause")
+			else:
+				print("Resume")
+				self.update_word()
 
 		elif key == "9":
 			save_current_state(self.state.current_book, self.state.current_page_index, self.state.current_word_index)
