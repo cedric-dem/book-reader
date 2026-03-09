@@ -418,7 +418,7 @@ class ReaderApp:
 			print("Home")
 
 if __name__ == "__main__":
-	analyze_all_books()
+	# analyze_all_books()
 
 	try:
 		root = tk.Tk()
