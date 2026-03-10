@@ -25,11 +25,6 @@
             android:foreground="@drawable/icon_home"
             android:textColor="@color/white" />
 
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5" />
-
         <Button
             android:id="@+id/button_switch_view"
             android:layout_width="0dp"
@@ -40,10 +35,15 @@
             android:foreground="@drawable/icon_switch_view"
             android:textColor="@color/white" />
 
-        <Space
+        <Button
+            android:id="@+id/button_book_statistics"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.5" />
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_reading_button"
+            android:foreground="@drawable/icon_info"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/button_play_pause"

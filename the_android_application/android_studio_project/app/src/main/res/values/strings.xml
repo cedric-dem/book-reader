@@ -12,4 +12,8 @@
     <string name="page_counter">Page : \n%1$d / %2$d</string>
     <string name="word_counter">Words : \n%1$d / %2$d</string>
     <string name="speed_counter">Reading speed : \n%1$d%%</string>
+    <string name="back_to_reader">Back to reader</string>
+    <string name="statistics_empty">No statistics available</string>
+    <string name="statistics_summary">Number of pages: %1$d\nPage with the biggest number of words: %2$d (%3$d words)</string>
+    <string name="statistics_page_words">Page %1$d: %2$d words</string>
 </resources>

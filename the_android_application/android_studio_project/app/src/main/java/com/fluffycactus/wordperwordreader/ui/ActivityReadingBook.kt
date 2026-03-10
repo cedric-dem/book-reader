@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import kotlin.math.roundToInt
+import android.content.Intent
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -54,6 +55,8 @@ class ActivityReadingBook : ComponentActivity() {
         currentWordTextView = findViewById(R.id.text_current_words)
         previousPageButton = findViewById(R.id.button_previous_page)
         nextPageButton = findViewById(R.id.button_next_page)
+
+        val statisticsButton = findViewById<Button>(R.id.button_book_statistics)
         val homeButton = findViewById<Button>(R.id.button_go_home)
         val rewindWordButton = findViewById<Button>(R.id.button_rewind_word)
         val jumpWordsButton = findViewById<Button>(R.id.button_jump_words)
@@ -143,6 +146,13 @@ class ActivityReadingBook : ComponentActivity() {
         homeButton.setOnClickListener {
             saveState()
             finish()
+        }
+
+        statisticsButton.setOnClickListener {
+            val statisticsIntent = Intent(this, ActivityStatistics::class.java).apply {
+                putExtra(Config.EXTRA_BOOK_URI, bookUri?.toString())
+            }
+            startActivity(statisticsIntent)
         }
 
         updateUi()

@@ -1,5 +1,6 @@
 todo : 
-	both android and python : 
+	both android and python :
+		big numbers, add space 
 		switch from delay to speed, more natural
 		speed percentage should be speeed_coefficient, initialized ad 1.0, step of like 0.1
 		reading epub :
@@ -8,16 +9,14 @@ todo :
 			dont know for now "
 
 	only android:
-		implement many things like 
-			bookmarks
-			save state
-			dark theme
-			pause play
-			view mode
-			options menu ? containing dark mode and sound (either read book + sound when turning page)
-		crash on other books
-		benchmark
-		
+		bookmarks
+		dark theme switch to light theme
+		view mode
+		options menu ? containing dark mode and sound (either read book + sound when turning page)
+		history of last books read, and which page left
+		fix information page, make it scrollable
+
+	benchmark	
 
 			
 physical object using python :
