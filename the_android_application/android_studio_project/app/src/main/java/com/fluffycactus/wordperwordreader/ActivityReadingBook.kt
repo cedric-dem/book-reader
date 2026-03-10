@@ -19,6 +19,7 @@ class ActivityReadingBook : ComponentActivity() {
     private var chapterPagesWords: List<List<String>> = emptyList()
     private var totalPages = 0
     private var currentPageIndex = 0
+    private var isPaused = false
 
     private var currentWordIndex: Int = 0
 
@@ -48,6 +49,7 @@ class ActivityReadingBook : ComponentActivity() {
         val homeButton = findViewById<Button>(R.id.button_go_home)
         val rewindWordButton = findViewById<Button>(R.id.button_rewind_word)
         val jumpWordsButton = findViewById<Button>(R.id.button_jump_words)
+        val playPauseButton = findViewById<Button>(R.id.button_play_pause)
         val decreaseSpeedButton = findViewById<Button>(R.id.button_decrease_speed)
         val increaseSpeedButton = findViewById<Button>(R.id.button_increase_speed)
         currentSpeedTextView = findViewById(R.id.text_current_speed)
@@ -106,6 +108,11 @@ class ActivityReadingBook : ComponentActivity() {
                 updateUi()
                 restartAutoAdvance()
             }
+        }
+
+        playPauseButton.setOnClickListener {
+            isPaused = !isPaused
+            restartAutoAdvance()
         }
 
         decreaseSpeedButton.setOnClickListener {
@@ -169,7 +176,9 @@ class ActivityReadingBook : ComponentActivity() {
 
     private fun restartAutoAdvance() {
         autoAdvanceHandler.removeCallbacks(autoAdvanceRunnable)
-        autoAdvanceHandler.postDelayed(autoAdvanceRunnable, getDelayMilliseconds())
+        if (!isPaused) {
+            autoAdvanceHandler.postDelayed(autoAdvanceRunnable, getDelayMilliseconds())
+        }
     }
 
     override fun onDestroy() {
