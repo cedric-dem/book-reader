@@ -3,14 +3,14 @@ package com.fluffycactus.wordperwordreader
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
+import kotlin.math.roundToInt
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 
 class ActivityReadingBook : ComponentActivity() {
-    private var delayPercentage = 100
+    private var currentSpeedFactor = 1.0
     private val jumpWordsCount = ReaderConfig.JUMP_WORDS_QTY
 
     private val autoAdvanceHandler = Handler(Looper.getMainLooper())
@@ -116,14 +116,14 @@ class ActivityReadingBook : ComponentActivity() {
         }
 
         decreaseSpeedButton.setOnClickListener {
-            delayPercentage = (delayPercentage - ReaderConfig.STEP_PERCENTAGE)
-                .coerceAtLeast(ReaderConfig.STEP_PERCENTAGE)
+            currentSpeedFactor = (currentSpeedFactor - ReaderConfig.STEP_SPEED_FACTOR)
+                .coerceAtLeast(ReaderConfig.STEP_SPEED_FACTOR)
             updateUi()
             restartAutoAdvance()
         }
 
         increaseSpeedButton.setOnClickListener {
-            delayPercentage += ReaderConfig.STEP_PERCENTAGE
+            currentSpeedFactor += ReaderConfig.STEP_SPEED_FACTOR
             updateUi()
             restartAutoAdvance()
         }
@@ -151,7 +151,7 @@ class ActivityReadingBook : ComponentActivity() {
                 punctuationCoefficient
                         * wordSizeCoefficient
                         * ReaderConfig.GENERAL_DELAY
-                        * (delayPercentage / 100.0)
+                        * (2 - currentSpeedFactor) //Or 1/speedfactor ?
                 )
 
         return (delaySeconds * 1000).toLong().coerceAtLeast(1L)
@@ -169,7 +169,8 @@ class ActivityReadingBook : ComponentActivity() {
             safeWordIndex + 1,
             currentPageWords.size
         )
-        currentSpeedTextView.text = getString(R.string.speed_counter, delayPercentage)
+        val speedPercent = (currentSpeedFactor * 100).roundToInt()
+        currentSpeedTextView.text = getString(R.string.speed_counter, speedPercent)
     }
 
     private fun restartAutoAdvance() {
