@@ -2,22 +2,55 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     android:gravity="center"
     android:orientation="vertical"
     android:padding="24dp">
 
-    <Button
-        android:id="@+id/browseEpubButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/browse_epub" />
-
     <TextView
         android:id="@+id/selectedFileText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/no_epub_selected"
-        android:textAlignment="center" />
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_surface_panel"
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="@string/app_main_title"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/browseEpubButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_reading_button"
+        android:text="@string/browse_epub"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="17sp" />
+
+    <Button
+        android:id="@+id/button_dark_mode"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_reading_button"
+        android:text="@string/dark_mode"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="17sp" />
+
+    <Button
+        android:id="@+id/button_quit"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_reading_button"
+        android:text="@string/quit"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="17sp" />
 
 </LinearLayout>

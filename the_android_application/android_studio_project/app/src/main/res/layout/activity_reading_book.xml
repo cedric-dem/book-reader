@@ -3,48 +3,50 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.2"
-        android:orientation="horizontal">
+        android:layout_marginBottom="10dp"
+        android:layout_weight="0.18"
+        android:background="@drawable/bg_surface_panel"
+        android:orientation="horizontal"
+        android:padding="8dp">
 
         <Button
             android:id="@+id/button_go_home"
-            android:foreground="@drawable/icon_home"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/reading_button_gray"
+            android:background="@drawable/bg_reading_button"
+            android:foreground="@drawable/icon_home"
             android:textColor="@color/white" />
 
-        <Button
-            android:id="@+id/button_dark_mode"
-            android:foreground="@drawable/icon_dark_mode"
+        <Space
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:backgroundTint="@color/reading_button_gray"
-            android:textColor="@color/white" />
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/button_switch_view"
-            android:foreground="@drawable/icon_switch_view"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/reading_button_gray"
+            android:background="@drawable/bg_reading_button"
+            android:foreground="@drawable/icon_switch_view"
             android:textColor="@color/white" />
 
         <Button
             android:id="@+id/button_play_pause"
-            android:foreground="@drawable/icon_play_pause"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:backgroundTint="@color/reading_button_gray"
+            android:background="@drawable/bg_reading_button"
+            android:foreground="@drawable/icon_play_pause"
             android:textColor="@color/white" />
 
     </LinearLayout>
@@ -53,8 +55,11 @@
         android:id="@+id/text_book_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginBottom="10dp"
         android:layout_weight="1"
+        android:background="@drawable/bg_surface_panel"
         android:gravity="center"
+        android:padding="16dp"
         android:text="word will be here"
         android:textColor="@color/white"
         android:textSize="44sp" />
@@ -62,47 +67,57 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:orientation="vertical">
+        android:layout_weight="0.52"
+        android:background="@drawable/bg_surface_panel"
+        android:orientation="vertical"
+        android:padding="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_marginBottom="6dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/button_decrease_speed"
-                android:foreground="@drawable/icon_arrow_left"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/reading_button_gray"
+                android:background="@drawable/bg_reading_button"
+                android:foreground="@drawable/icon_arrow_left"
                 android:textColor="@color/white" />
 
             <ImageView
                 android:id="@+id/icon_view_speed"
-                android:src="@drawable/icon_reading_speed"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_marginHorizontal="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_reading_button"
+                android:padding="10dp"
+                android:src="@drawable/icon_reading_speed" />
 
             <Button
                 android:id="@+id/button_increase_speed"
-                android:foreground="@drawable/icon_arrow_right"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/reading_button_gray"
+                android:background="@drawable/bg_reading_button"
+                android:foreground="@drawable/icon_arrow_right"
                 android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/text_current_speed"
-                android:text="Reading speed :\n10%"
-                android:gravity="center"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
+                android:background="@drawable/bg_reading_button"
+                android:gravity="center"
+                android:text="Reading speed :&#10;10%"
                 android:textColor="@color/white" />
 
         </LinearLayout>
@@ -111,40 +126,48 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_marginBottom="6dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/button_previous_page"
-                android:foreground="@drawable/icon_arrow_left"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/reading_button_gray"
+                android:background="@drawable/bg_reading_button"
+                android:foreground="@drawable/icon_arrow_left"
                 android:textColor="@color/white" />
 
             <ImageView
                 android:id="@+id/icon_view_page"
-                android:src="@drawable/icon_page"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_marginHorizontal="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_reading_button"
+                android:padding="10dp"
+                android:src="@drawable/icon_page" />
 
             <Button
                 android:id="@+id/button_next_page"
-                android:foreground="@drawable/icon_arrow_right"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/reading_button_gray"
+                android:background="@drawable/bg_reading_button"
+                android:foreground="@drawable/icon_arrow_right"
                 android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/text_current_page"
-                android:text="Page :\n120 / 333"
-                android:gravity="center"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
+                android:background="@drawable/bg_reading_button"
+                android:gravity="center"
+                android:text="Page :&#10;120 / 333"
                 android:textColor="@color/white" />
 
         </LinearLayout>
@@ -153,40 +176,48 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:layout_marginBottom="6dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/button_rewind_word"
-                android:foreground="@drawable/icon_arrow_left"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/reading_button_gray"
+                android:background="@drawable/bg_reading_button"
+                android:foreground="@drawable/icon_arrow_left"
                 android:textColor="@color/white" />
 
             <ImageView
                 android:id="@+id/icon_view_word"
-                android:src="@drawable/word"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_marginHorizontal="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_reading_button"
+                android:padding="10dp"
+                android:src="@drawable/word" />
 
             <Button
                 android:id="@+id/button_jump_words"
-                android:foreground="@drawable/icon_arrow_right"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/reading_button_gray"
+                android:background="@drawable/bg_reading_button"
+                android:foreground="@drawable/icon_arrow_right"
                 android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/text_current_words"
-                android:text="Words :\n42 / 66"
-                android:gravity="center"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
+                android:background="@drawable/bg_reading_button"
+                android:gravity="center"
+                android:text="Words :&#10;42 / 66"
                 android:textColor="@color/white" />
 
         </LinearLayout>
@@ -196,43 +227,49 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="horizontal">
+
             <Button
                 android:id="@+id/button_save_bookmark"
-                android:foreground="@drawable/icon_save"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginEnd="6dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/reading_button_gray"
+                android:background="@drawable/bg_reading_button"
+                android:foreground="@drawable/icon_save"
                 android:textColor="@color/white" />
 
             <ImageView
                 android:id="@+id/icon_view_bookmark"
-                android:src="@drawable/icon_bookmark"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_marginHorizontal="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_reading_button"
+                android:padding="10dp"
+                android:src="@drawable/icon_bookmark" />
 
             <Button
                 android:id="@+id/button_load_bookmark"
-                android:foreground="@drawable/icon_load"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/reading_button_gray"
+                android:background="@drawable/bg_reading_button"
+                android:foreground="@drawable/icon_load"
                 android:textColor="@color/white" />
 
             <TextView
                 android:id="@+id/text_current_bookmark"
-                android:text="Bookmarks :\n3"
-                android:gravity="center"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
+                android:layout_marginStart="6dp"
                 android:layout_weight="1"
+                android:background="@drawable/bg_reading_button"
+                android:gravity="center"
+                android:text="Bookmarks :&#10;3"
                 android:textColor="@color/white" />
 
         </LinearLayout>
-
-
 
     </LinearLayout>
 

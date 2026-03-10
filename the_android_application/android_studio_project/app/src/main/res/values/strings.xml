@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Word Per Word Reader</string>
+    <string name="app_main_title">Word Per Word Reader</string>
     <string name="browse_epub">Browse EPUB</string>
-    <string name="no_epub_selected">No EPUB selected</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="quit">Quit</string>
     <string name="selected_epub">Selected: %1$s</string>
     <string name="epub_pick_cancelled">No file selected</string>
     <string name="reading_preview_title">First 100 words</string>
