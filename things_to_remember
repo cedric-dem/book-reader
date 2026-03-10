@@ -15,6 +15,9 @@ todo :
 			pause play
 			view mode
 			options menu ? containing dark mode and sound (either read book + sound when turning page)
+		crash on other books
+		benchmark
+		
 
 			
 physical object using python :

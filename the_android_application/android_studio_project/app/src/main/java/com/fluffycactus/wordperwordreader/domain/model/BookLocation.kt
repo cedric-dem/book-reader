@@ -1,4 +1,4 @@
-package com.fluffycactus.wordperwordreader
+package com.fluffycactus.wordperwordreader.domain.model
 
 data class BookLocation(
     var pageIndex: Int,

@@ -1,14 +1,17 @@
-package com.fluffycactus.wordperwordreader
+package com.fluffycactus.wordperwordreader.ui
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import com.fluffycactus.wordperwordreader.R
+import com.fluffycactus.wordperwordreader.domain.Config
 import java.io.InputStream
 import java.io.Serializable
 import java.util.zip.ZipInputStream
@@ -19,7 +22,7 @@ class ActivityMainMenu : ComponentActivity() {
 
     private val openEpubPicker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
-            selectedFileText.text = getString(R.string.selected_epub, uri.lastPathSegment ?: uri.toString())
+            val selectedFileName = resolveDisplayName(uri)
             contentResolver.takePersistableUriPermission(
                 uri,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -30,8 +33,8 @@ class ActivityMainMenu : ComponentActivity() {
             // Log.d("MainActivity","Passing data to ActivityReadingBook - chapters/pages=${chapterPagesWords.size}, firstElementSize=${chapterPagesWords.firstOrNull()?.size ?: 0}")
 
             val readingIntent = Intent(this, ActivityReadingBook::class.java).apply {
-                putExtra(ActivityReadingBook.EXTRA_CHAPTER_PAGES_WORDS, ArrayList(chapterPagesWords) as Serializable)
-                putExtra(ActivityReadingBook.EXTRA_BOOK_PATH, uri.path ?: uri.lastPathSegment ?: uri.toString())
+                putExtra(Config.EXTRA_CHAPTER_PAGES_WORDS, ArrayList(chapterPagesWords) as Serializable)
+                putExtra(Config.EXTRA_BOOK_PATH, selectedFileName)
             }
             startActivity(readingIntent)
         } else {
@@ -96,5 +99,19 @@ class ActivityMainMenu : ComponentActivity() {
         }
 
         return chapterPagesWords
+    }
+
+    private fun resolveDisplayName(uri: Uri): String {
+        contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex >= 0 && cursor.moveToFirst()) {
+                val displayName = cursor.getString(nameIndex)?.trim()
+                if (!displayName.isNullOrEmpty()) {
+                    return displayName
+                }
+            }
+        }
+
+        return uri.lastPathSegment ?: uri.toString()
     }
 }

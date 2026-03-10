@@ -13,11 +13,11 @@
         android:theme="@style/Theme.WordPerWordReader"
         tools:targetApi="31">
         <activity
-            android:name=".ActivityReadingBook"
+            android:name=".ui.ActivityReadingBook"
             android:exported="false"
             android:theme="@style/Theme.WordPerWordReader" />
         <activity
-            android:name=".ActivityMainMenu"
+            android:name=".ui.ActivityMainMenu"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.WordPerWordReader">

@@ -1,22 +1,25 @@
-package com.fluffycactus.wordperwordreader
+package com.fluffycactus.wordperwordreader.ui
 
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import kotlin.math.roundToInt
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
+import com.fluffycactus.wordperwordreader.domain.model.BookLocation
+import com.fluffycactus.wordperwordreader.domain.model.DataManager
+import com.fluffycactus.wordperwordreader.R
+import com.fluffycactus.wordperwordreader.domain.Config
 
 class ActivityReadingBook : ComponentActivity() {
 
     private lateinit var dataManager: DataManager;
 
     private var currentSpeedFactor = 1.0
-    private val jumpWordsCount = ReaderConfig.JUMP_WORDS_QTY
+    private val jumpWordsCount = Config.JUMP_WORDS_QTY
 
     private val autoAdvanceHandler = Handler(Looper.getMainLooper())
     private lateinit var autoAdvanceRunnable: Runnable
@@ -42,7 +45,7 @@ class ActivityReadingBook : ComponentActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_reading_book)
 
-        chapterPagesWords = (intent.getSerializableExtra(EXTRA_CHAPTER_PAGES_WORDS) as? ArrayList<*>)
+        chapterPagesWords = (intent.getSerializableExtra(Config.EXTRA_CHAPTER_PAGES_WORDS) as? ArrayList<*>)
             ?.mapNotNull { page ->
                 (page as? List<*>)?.mapNotNull { it as? String }
             }
@@ -63,7 +66,7 @@ class ActivityReadingBook : ComponentActivity() {
 
         // load progression if any
         dataManager = DataManager(this)
-        currentBookName = extractBookName(intent.getStringExtra(EXTRA_BOOK_PATH))
+        currentBookName = extractBookName(intent.getStringExtra(Config.EXTRA_BOOK_PATH))
         loadState()
 
         totalPages = chapterPagesWords.size
@@ -128,14 +131,14 @@ class ActivityReadingBook : ComponentActivity() {
         }
 
         decreaseSpeedButton.setOnClickListener {
-            currentSpeedFactor = (currentSpeedFactor - ReaderConfig.STEP_SPEED_FACTOR)
-                .coerceAtLeast(ReaderConfig.STEP_SPEED_FACTOR)
+            currentSpeedFactor = (currentSpeedFactor - Config.STEP_SPEED_FACTOR)
+                .coerceAtLeast(Config.STEP_SPEED_FACTOR)
             updateUi()
             restartAutoAdvance()
         }
 
         increaseSpeedButton.setOnClickListener {
-            currentSpeedFactor += ReaderConfig.STEP_SPEED_FACTOR
+            currentSpeedFactor += Config.STEP_SPEED_FACTOR
             updateUi()
             restartAutoAdvance()
         }
@@ -152,18 +155,18 @@ class ActivityReadingBook : ComponentActivity() {
     private fun getDelayMilliseconds(): Long {
         val word = chapterPagesWords[currentBookLocation.pageIndex][currentBookLocation.wordNumber]
 
-        val wordSizeCoefficient = word.length.toDouble() / ReaderConfig.WORD_SIZE_REFERENCE
+        val wordSizeCoefficient = word.length.toDouble() / Config.WORD_SIZE_REFERENCE
 
         val punctuationCoefficient = if (word.endsWith(".") or word.endsWith("?") or word.endsWith(",") or word.endsWith(":")) {
-            ReaderConfig.PUNCTUATION_DELAY
+            Config.PUNCTUATION_DELAY
         } else {
             1.0
         }
 
-        val delaySeconds = ReaderConfig.OFFSET_DELAY_MS + (
+        val delaySeconds = Config.OFFSET_DELAY_MS + (
                 punctuationCoefficient
                         * wordSizeCoefficient
-                        * ReaderConfig.GENERAL_DELAY
+                        * Config.GENERAL_DELAY
                         * (2 - currentSpeedFactor) //Or 1/speedfactor ?
                 )
 
@@ -236,10 +239,5 @@ class ActivityReadingBook : ComponentActivity() {
         } else {
             fileName
         }
-    }
-
-    companion object {
-        const val EXTRA_CHAPTER_PAGES_WORDS = "extra_chapter_pages_words"
-        const val EXTRA_BOOK_PATH = "extra_book_path"
     }
 }

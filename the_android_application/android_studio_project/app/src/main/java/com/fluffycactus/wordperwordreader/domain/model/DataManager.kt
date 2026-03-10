@@ -1,4 +1,4 @@
-package com.fluffycactus.wordperwordreader
+package com.fluffycactus.wordperwordreader.domain.model
 
 import android.content.Context
 import com.google.gson.Gson
