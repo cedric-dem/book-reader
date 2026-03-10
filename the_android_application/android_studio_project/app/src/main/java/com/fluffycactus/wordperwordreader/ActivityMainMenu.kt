@@ -2,7 +2,6 @@ package com.fluffycactus.wordperwordreader
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -14,7 +13,7 @@ import java.io.InputStream
 import java.io.Serializable
 import java.util.zip.ZipInputStream
 
-class MainActivity : ComponentActivity() {
+class ActivityMainMenu : ComponentActivity() {
 
     private lateinit var selectedFileText: TextView
 
@@ -42,7 +41,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_menu)
 
         val browseEpubButton = findViewById<Button>(R.id.browseEpubButton)
         val quitButton = findViewById<Button>(R.id.button_quit)
