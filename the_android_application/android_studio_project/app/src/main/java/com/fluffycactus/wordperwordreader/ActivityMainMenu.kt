@@ -31,6 +31,7 @@ class ActivityMainMenu : ComponentActivity() {
 
             val readingIntent = Intent(this, ActivityReadingBook::class.java).apply {
                 putExtra(ActivityReadingBook.EXTRA_CHAPTER_PAGES_WORDS, ArrayList(chapterPagesWords) as Serializable)
+                putExtra(ActivityReadingBook.EXTRA_BOOK_PATH, uri.path ?: uri.lastPathSegment ?: uri.toString())
             }
             startActivity(readingIntent)
         } else {

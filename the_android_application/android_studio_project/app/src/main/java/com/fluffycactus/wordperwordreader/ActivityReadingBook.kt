@@ -3,13 +3,18 @@ package com.fluffycactus.wordperwordreader
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import kotlin.math.roundToInt
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 
 class ActivityReadingBook : ComponentActivity() {
+
+    private lateinit var dataManager: DataManager;
+
     private var currentSpeedFactor = 1.0
     private val jumpWordsCount = ReaderConfig.JUMP_WORDS_QTY
 
@@ -18,10 +23,12 @@ class ActivityReadingBook : ComponentActivity() {
 
     private var chapterPagesWords: List<List<String>> = emptyList()
     private var totalPages = 0
-    private var currentPageIndex = 0
     private var isPaused = false
 
-    private var currentWordIndex: Int = 0
+    private lateinit var currentBookLocation: BookLocation
+    private lateinit var currentBookName: String
+    //private var currentPageIndex = 0
+    //private var currentWordIndex: Int = 0
 
     private lateinit var contentTextView: TextView
     private lateinit var currentPageTextView: TextView
@@ -54,6 +61,11 @@ class ActivityReadingBook : ComponentActivity() {
         val increaseSpeedButton = findViewById<Button>(R.id.button_increase_speed)
         currentSpeedTextView = findViewById(R.id.text_current_speed)
 
+        // load progression if any
+        dataManager = DataManager(this)
+        currentBookName = extractBookName(intent.getStringExtra(EXTRA_BOOK_PATH))
+        loadState()
+
         totalPages = chapterPagesWords.size
 
         if (chapterPagesWords.isEmpty()) {
@@ -66,45 +78,45 @@ class ActivityReadingBook : ComponentActivity() {
         }
 
         autoAdvanceRunnable = Runnable {
-            val currentPageWords = chapterPagesWords[currentPageIndex]
-            if (currentWordIndex < currentPageWords.lastIndex) {
-                currentWordIndex += 1
+            val currentPageWords = chapterPagesWords[currentBookLocation.pageIndex]
+            if (currentBookLocation.wordNumber < currentPageWords.lastIndex) {
+                currentBookLocation.wordNumber += 1
                 updateUi()
                 autoAdvanceHandler.postDelayed(autoAdvanceRunnable, getDelayMilliseconds())
             }
         }
 
         previousPageButton.setOnClickListener {
-            if (currentPageIndex > 0) {
-                currentPageIndex -= 1
-                currentWordIndex = 0
+            if (currentBookLocation.pageIndex > 0) {
+                currentBookLocation.pageIndex -= 1
+                currentBookLocation.wordNumber = 0
                 updateUi()
                 restartAutoAdvance()
             }
         }
 
         nextPageButton.setOnClickListener {
-            if (currentPageIndex < chapterPagesWords.lastIndex) {
-                currentPageIndex += 1
-                currentWordIndex = 0
+            if (currentBookLocation.pageIndex < chapterPagesWords.lastIndex) {
+                currentBookLocation.pageIndex += 1
+                currentBookLocation.wordNumber = 0
                 updateUi()
                 restartAutoAdvance()
             }
         }
         rewindWordButton.setOnClickListener {
-            val targetWordIndex = currentWordIndex - jumpWordsCount
+            val targetWordIndex = currentBookLocation.wordNumber - jumpWordsCount
             if (targetWordIndex >= 0) {
-                currentWordIndex = targetWordIndex
+                currentBookLocation.wordNumber = targetWordIndex
                 updateUi()
                 restartAutoAdvance()
             }
         }
 
         jumpWordsButton.setOnClickListener {
-            val currentPageWords = chapterPagesWords[currentPageIndex]
-            val targetWordIndex = currentWordIndex + jumpWordsCount
+            val currentPageWords = chapterPagesWords[currentBookLocation.pageIndex]
+            val targetWordIndex = currentBookLocation.wordNumber + jumpWordsCount
             if (targetWordIndex <= currentPageWords.lastIndex) {
-                currentWordIndex = targetWordIndex
+                currentBookLocation.wordNumber = targetWordIndex
                 updateUi()
                 restartAutoAdvance()
             }
@@ -129,6 +141,7 @@ class ActivityReadingBook : ComponentActivity() {
         }
 
         homeButton.setOnClickListener {
+            saveState() //save location before going home
             finish()
         }
 
@@ -137,7 +150,7 @@ class ActivityReadingBook : ComponentActivity() {
     }
 
     private fun getDelayMilliseconds(): Long {
-        val word = chapterPagesWords[currentPageIndex][currentWordIndex]
+        val word = chapterPagesWords[currentBookLocation.pageIndex][currentBookLocation.wordNumber]
 
         val wordSizeCoefficient = word.length.toDouble() / ReaderConfig.WORD_SIZE_REFERENCE
 
@@ -158,12 +171,14 @@ class ActivityReadingBook : ComponentActivity() {
     }
 
     private fun updateUi() {
-        val currentPageWords = chapterPagesWords[currentPageIndex]
-        val safeWordIndex = currentWordIndex.coerceIn(0, currentPageWords.lastIndex)
-        currentWordIndex = safeWordIndex
+        //saveState() //save location avery refresh ? safer but more access to memory
+
+        val currentPageWords = chapterPagesWords[currentBookLocation.pageIndex]
+        val safeWordIndex = currentBookLocation.wordNumber.coerceIn(0, currentPageWords.lastIndex)
+        currentBookLocation.wordNumber = safeWordIndex
 
         contentTextView.text = currentPageWords[safeWordIndex]
-        currentPageTextView.text = getString(R.string.page_counter, currentPageIndex + 1, totalPages)
+        currentPageTextView.text = getString(R.string.page_counter, currentBookLocation.pageIndex + 1, totalPages)
         currentWordTextView.text = getString(
             R.string.word_counter,
             safeWordIndex + 1,
@@ -185,7 +200,46 @@ class ActivityReadingBook : ComponentActivity() {
         super.onDestroy()
     }
 
+    private fun saveState() { //todo
+        dataManager.saveValue(currentBookName, currentBookLocation.pageIndex, currentBookLocation.wordNumber)
+
+    }
+
+    private fun loadState() {
+        val result = dataManager.getValue(currentBookName)
+        val messageUser: String;
+
+        if (result != null) {
+            //Log.d("save_x", "for " + currentBookName + " found page = ${result.pageIndex}, word index = ${result.wordNumber}")
+            currentBookLocation = BookLocation(result.pageIndex, result.wordNumber)
+            messageUser = "continuing book " + currentBookName + " at page " + result.pageIndex.toString() + " and word " + result.wordNumber.toString()
+
+        } else {
+            //Log.d("save_x", "for " + currentBookName + " not found")
+            currentBookLocation = BookLocation(0, 0)
+            messageUser = "Beginning book " + currentBookName
+        }
+
+        Toast.makeText(this, messageUser, Toast.LENGTH_SHORT).show();
+    }
+
+
+    private fun extractBookName(bookPath: String?): String {
+        val fileName = bookPath
+            ?.substringAfterLast('/')
+            ?.substringAfterLast('\\')
+            ?.substringBeforeLast('.')
+            ?.trim()
+
+        return if (fileName.isNullOrEmpty()) {
+            "unknown_book"
+        } else {
+            fileName
+        }
+    }
+
     companion object {
         const val EXTRA_CHAPTER_PAGES_WORDS = "extra_chapter_pages_words"
+        const val EXTRA_BOOK_PATH = "extra_book_path"
     }
 }

@@ -35,6 +35,7 @@ android {
 dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.core.ktx)
+    implementation("com.google.code.gson:gson:2.10.1")
     implementation(libs.androidx.lifecycle.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
