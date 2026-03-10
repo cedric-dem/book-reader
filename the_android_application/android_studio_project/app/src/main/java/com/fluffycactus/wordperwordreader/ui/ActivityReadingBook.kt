@@ -1,5 +1,6 @@
 package com.fluffycactus.wordperwordreader.ui
 
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,6 +14,8 @@ import com.fluffycactus.wordperwordreader.domain.model.BookLocation
 import com.fluffycactus.wordperwordreader.domain.model.DataManager
 import com.fluffycactus.wordperwordreader.R
 import com.fluffycactus.wordperwordreader.domain.Config
+import java.io.InputStream
+import java.util.zip.ZipInputStream
 
 class ActivityReadingBook : ComponentActivity() {
 
@@ -30,8 +33,6 @@ class ActivityReadingBook : ComponentActivity() {
 
     private lateinit var currentBookLocation: BookLocation
     private lateinit var currentBookName: String
-    //private var currentPageIndex = 0
-    //private var currentWordIndex: Int = 0
 
     private lateinit var contentTextView: TextView
     private lateinit var currentPageTextView: TextView
@@ -45,11 +46,8 @@ class ActivityReadingBook : ComponentActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_reading_book)
 
-        chapterPagesWords = (intent.getSerializableExtra(Config.EXTRA_CHAPTER_PAGES_WORDS) as? ArrayList<*>)
-            ?.mapNotNull { page ->
-                (page as? List<*>)?.mapNotNull { it as? String }
-            }
-            .orEmpty()
+        val bookUri = intent.getStringExtra(Config.EXTRA_BOOK_URI)?.let { Uri.parse(it) }
+        chapterPagesWords = bookUri?.let { extractChapterPagesFromEpub(it) }.orEmpty()
 
         contentTextView = findViewById(R.id.text_book_content)
         currentPageTextView = findViewById(R.id.text_current_page)
@@ -64,7 +62,6 @@ class ActivityReadingBook : ComponentActivity() {
         val increaseSpeedButton = findViewById<Button>(R.id.button_increase_speed)
         currentSpeedTextView = findViewById(R.id.text_current_speed)
 
-        // load progression if any
         dataManager = DataManager(this)
         currentBookName = extractBookName(intent.getStringExtra(Config.EXTRA_BOOK_PATH))
         loadState()
@@ -144,12 +141,53 @@ class ActivityReadingBook : ComponentActivity() {
         }
 
         homeButton.setOnClickListener {
-            saveState() //save location before going home
+            saveState()
             finish()
         }
 
         updateUi()
         restartAutoAdvance()
+    }
+
+    private fun extractChapterPagesFromEpub(uri: Uri): List<List<String>> {
+        return try {
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                extractWordsByChapterPageFromStream(inputStream)
+            } ?: emptyList()
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
+    private fun extractWordsByChapterPageFromStream(inputStream: InputStream): List<List<String>> {
+        val chapterPagesWords = mutableListOf<List<String>>()
+
+        ZipInputStream(inputStream).use { zip ->
+            var entry = zip.nextEntry
+            while (entry != null) {
+                val entryName = entry.name.lowercase()
+                if (!entry.isDirectory && (entryName.endsWith(".xhtml") || entryName.endsWith(".html") || entryName.endsWith(".htm"))) {
+                    val rawText = zip.readBytes().toString(Charsets.UTF_8)
+                    val cleanedText = rawText
+                        .replace(Regex("<[^>]+>"), " ")
+                        .replace(Regex("&(rsquo|lsquo|apos);", RegexOption.IGNORE_CASE), "'")
+                        .replace(Regex("&#39;|&#x27;", RegexOption.IGNORE_CASE), "'")
+                        .replace(Regex("&[a-zA-Z#0-9]+;"), " ")
+
+                    val words = cleanedText
+                        .split(Regex("\\s+"))
+                        .filter { it.isNotBlank() }
+
+                    if (words.isNotEmpty()) {
+                        chapterPagesWords.add(words)
+                    }
+                }
+                zip.closeEntry()
+                entry = zip.nextEntry
+            }
+        }
+
+        return chapterPagesWords
     }
 
     private fun getDelayMilliseconds(): Long {
@@ -167,15 +205,13 @@ class ActivityReadingBook : ComponentActivity() {
                 punctuationCoefficient
                         * wordSizeCoefficient
                         * Config.GENERAL_DELAY
-                        * (2 - currentSpeedFactor) //Or 1/speedfactor ?
+                        * (2 - currentSpeedFactor)
                 )
 
         return (delaySeconds * 1000).toLong().coerceAtLeast(1L)
     }
 
     private fun updateUi() {
-        //saveState() //save location avery refresh ? safer but more access to memory
-
         val currentPageWords = chapterPagesWords[currentBookLocation.pageIndex]
         val safeWordIndex = currentBookLocation.wordNumber.coerceIn(0, currentPageWords.lastIndex)
         currentBookLocation.wordNumber = safeWordIndex
@@ -203,22 +239,19 @@ class ActivityReadingBook : ComponentActivity() {
         super.onDestroy()
     }
 
-    private fun saveState() { //todo
+    private fun saveState() {
         dataManager.saveValue(currentBookName, currentBookLocation.pageIndex, currentBookLocation.wordNumber)
-
     }
 
     private fun loadState() {
         val result = dataManager.getValue(currentBookName)
-        val messageUser: String;
+        val messageUser: String
 
         if (result != null) {
-            //Log.d("save_x", "for " + currentBookName + " found page = ${result.pageIndex}, word index = ${result.wordNumber}")
             currentBookLocation = BookLocation(result.pageIndex, result.wordNumber)
             messageUser = "continuing book " + currentBookName + " at page " + result.pageIndex.toString() + " and word " + result.wordNumber.toString()
 
         } else {
-            //Log.d("save_x", "for " + currentBookName + " not found")
             currentBookLocation = BookLocation(0, 0)
             messageUser = "Beginning book " + currentBookName
         }
