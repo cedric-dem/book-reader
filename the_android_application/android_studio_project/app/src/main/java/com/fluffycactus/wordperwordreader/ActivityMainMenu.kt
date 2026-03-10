@@ -77,6 +77,8 @@ class ActivityMainMenu : ComponentActivity() {
                     val rawText = zip.readBytes().toString(Charsets.UTF_8)
                     val cleanedText = rawText
                         .replace(Regex("<[^>]+>"), " ")
+                        .replace(Regex("&(rsquo|lsquo|apos);", RegexOption.IGNORE_CASE), "'")
+                        .replace(Regex("&#39;|&#x27;", RegexOption.IGNORE_CASE), "'")
                         .replace(Regex("&[a-zA-Z#0-9]+;"), " ")
 
                     val words = cleanedText

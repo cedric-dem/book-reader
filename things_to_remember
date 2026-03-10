@@ -1,7 +1,11 @@
 todo : 
 	both android and python : 
 		switch from delay to speed, more natural
-		swspeed percentage should be speeed_coefficient, initialized ad 1.0, step of like 0.1
+		speed percentage should be speeed_coefficient, initialized ad 1.0, step of like 0.1
+		reading epub :
+			' should concatenete before and after words
+			: . , ? should concatenate only before, and add delay
+			dont know for now "
 
 	only android:
 		implement many things like 

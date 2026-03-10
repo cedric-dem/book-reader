@@ -141,10 +141,8 @@ class ActivityReadingBook : ComponentActivity() {
 
         val wordSizeCoefficient = word.length.toDouble() / ReaderConfig.WORD_SIZE_REFERENCE
 
-        val punctuationCoefficient = if (word.endsWith(".")) {
-            ReaderConfig.DOT_DELAY
-        } else if (word.endsWith(",")) {
-            ReaderConfig.COMMA_DELAY
+        val punctuationCoefficient = if (word.endsWith(".") or word.endsWith("?") or word.endsWith(",") or word.endsWith(":")) {
+            ReaderConfig.PUNCTUATION_DELAY
         } else {
             1.0
         }
