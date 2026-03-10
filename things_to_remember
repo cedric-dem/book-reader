@@ -15,6 +15,7 @@ todo :
 		options menu ? containing dark mode and sound (either read book + sound when turning page)
 		history of last books read, and which page left
 		fix information page, make it scrollable
+		remove code duplication in activity reading book reading epub
 
 	benchmark	
 
