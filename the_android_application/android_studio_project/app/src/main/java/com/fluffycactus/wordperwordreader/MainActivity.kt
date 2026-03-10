@@ -45,10 +45,15 @@ class MainActivity : ComponentActivity() {
         setContentView(R.layout.activity_main)
 
         val browseEpubButton = findViewById<Button>(R.id.browseEpubButton)
+        val quitButton = findViewById<Button>(R.id.button_quit)
         selectedFileText = findViewById(R.id.selectedFileText)
 
         browseEpubButton.setOnClickListener {
             openEpubPicker.launch(arrayOf("application/epub+zip"))
+        }
+
+        quitButton.setOnClickListener {
+            finishAffinity()
         }
     }
 

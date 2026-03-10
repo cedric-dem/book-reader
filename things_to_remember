@@ -7,10 +7,11 @@ todo :
 		implement many things like 
 			bookmarks
 			save state
-			correct menu
 			dark theme
 			pause play
 			view mode
+			options menu ? containing dark mode and sound (either read book + sound when turning page)
+
 			
 physical object using python :
 	speaker for current word ? and/or page turn

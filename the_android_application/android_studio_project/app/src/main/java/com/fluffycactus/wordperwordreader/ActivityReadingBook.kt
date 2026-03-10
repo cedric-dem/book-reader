@@ -19,6 +19,7 @@ class ActivityReadingBook : ComponentActivity() {
     private var chapterPagesWords: List<List<String>> = emptyList()
     private var totalPages = 0
     private var currentPageIndex = 0
+
     private var currentWordIndex: Int = 0
 
     private lateinit var contentTextView: TextView
@@ -44,6 +45,7 @@ class ActivityReadingBook : ComponentActivity() {
         currentWordTextView = findViewById(R.id.text_current_words)
         previousPageButton = findViewById(R.id.button_previous_page)
         nextPageButton = findViewById(R.id.button_next_page)
+        val homeButton = findViewById<Button>(R.id.button_go_home)
         val rewindWordButton = findViewById<Button>(R.id.button_rewind_word)
         val jumpWordsButton = findViewById<Button>(R.id.button_jump_words)
         val decreaseSpeedButton = findViewById<Button>(R.id.button_decrease_speed)
@@ -119,6 +121,10 @@ class ActivityReadingBook : ComponentActivity() {
             restartAutoAdvance()
         }
 
+        homeButton.setOnClickListener {
+            finish()
+        }
+
         updateUi()
         restartAutoAdvance()
     }
@@ -137,11 +143,11 @@ class ActivityReadingBook : ComponentActivity() {
         }
 
         val delaySeconds = ReaderConfig.OFFSET_DELAY_MS + (
-            punctuationCoefficient
-            * wordSizeCoefficient
-            * ReaderConfig.GENERAL_DELAY
-            * (delayPercentage / 100.0)
-        )
+                punctuationCoefficient
+                        * wordSizeCoefficient
+                        * ReaderConfig.GENERAL_DELAY
+                        * (delayPercentage / 100.0)
+                )
 
         return (delaySeconds * 1000).toLong().coerceAtLeast(1L)
     }
