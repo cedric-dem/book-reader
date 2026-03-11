@@ -16,8 +16,29 @@ todo :
 		history of last books read, and which page left
 		fix information page, make it scrollable
 		remove code duplication in activity reading book reading epub
+		statistics :
+			number of pages
+			total number of words
+			time taken at 100% speed
+
+			length each page
+
 
 	benchmark	
+		part one of jonathan livingston seagull - 3056 words - 231 sentences - 13724 char without spaces - 16780 char with spaces
+		
+		"word by word" reading : 
+			100% : 16min01 could be faster
+			150% : 11min55 could be faster
+			200% : 
+
+		"normal" reading : 
+			me : 19min10
+			according to internet, around 250 words per minute so 12 min 30
+
+
+
+
 
 			
 physical object using python :

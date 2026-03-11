@@ -8,8 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import com.fluffycactus.wordperwordreader.R
 import com.fluffycactus.wordperwordreader.domain.Config
-import java.io.InputStream
-import java.util.zip.ZipInputStream
+import com.fluffycactus.wordperwordreader.domain.model.extractChapterPagesFromEpub
 
 class ActivityStatistics : ComponentActivity() {
 
@@ -22,7 +21,7 @@ class ActivityStatistics : ComponentActivity() {
         val backButton = findViewById<Button>(R.id.button_back_to_reader)
 
         val bookUri = intent.getStringExtra(Config.EXTRA_BOOK_URI)?.let { Uri.parse(it) }
-        val chapterPagesWords = bookUri?.let { extractChapterPagesFromEpub(it) }.orEmpty()
+        val chapterPagesWords = bookUri?.let { extractChapterPagesFromEpub(contentResolver, it) }.orEmpty()
 
         statisticsTextView.text = getStatisticsText(chapterPagesWords)
 
@@ -41,46 +40,5 @@ class ActivityStatistics : ComponentActivity() {
                 getString(R.string.statistics_page_words, index + 1, words.size)
             }
             .joinToString(separator = "\n")
-    }
-
-    private fun extractChapterPagesFromEpub(uri: Uri): List<List<String>> {
-        return try {
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                extractWordsByChapterPageFromStream(inputStream)
-            } ?: emptyList()
-        } catch (_: Exception) {
-            emptyList()
-        }
-    }
-
-    private fun extractWordsByChapterPageFromStream(inputStream: InputStream): List<List<String>> {
-        val chapterPagesWords = mutableListOf<List<String>>()
-
-        ZipInputStream(inputStream).use { zip ->
-            var entry = zip.nextEntry
-            while (entry != null) {
-                val entryName = entry.name.lowercase()
-                if (!entry.isDirectory && (entryName.endsWith(".xhtml") || entryName.endsWith(".html") || entryName.endsWith(".htm"))) {
-                    val rawText = zip.readBytes().toString(Charsets.UTF_8)
-                    val cleanedText = rawText
-                        .replace(Regex("<[^>]+>"), " ")
-                        .replace(Regex("&(rsquo|lsquo|apos);", RegexOption.IGNORE_CASE), "'")
-                        .replace(Regex("&#39;|&#x27;", RegexOption.IGNORE_CASE), "'")
-                        .replace(Regex("&[a-zA-Z#0-9]+;"), " ")
-
-                    val words = cleanedText
-                        .split(Regex("\\s+"))
-                        .filter { it.isNotBlank() }
-
-                    if (words.isNotEmpty()) {
-                        chapterPagesWords.add(words)
-                    }
-                }
-                zip.closeEntry()
-                entry = zip.nextEntry
-            }
-        }
-
-        return chapterPagesWords
     }
 }

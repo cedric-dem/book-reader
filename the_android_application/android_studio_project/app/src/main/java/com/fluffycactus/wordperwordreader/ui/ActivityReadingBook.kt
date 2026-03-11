@@ -15,8 +15,7 @@ import com.fluffycactus.wordperwordreader.domain.model.BookLocation
 import com.fluffycactus.wordperwordreader.domain.model.DataManager
 import com.fluffycactus.wordperwordreader.R
 import com.fluffycactus.wordperwordreader.domain.Config
-import java.io.InputStream
-import java.util.zip.ZipInputStream
+import com.fluffycactus.wordperwordreader.domain.model.extractChapterPagesFromEpub
 
 class ActivityReadingBook : ComponentActivity() {
 
@@ -48,7 +47,7 @@ class ActivityReadingBook : ComponentActivity() {
         setContentView(R.layout.activity_reading_book)
 
         val bookUri = intent.getStringExtra(Config.EXTRA_BOOK_URI)?.let { Uri.parse(it) }
-        chapterPagesWords = bookUri?.let { extractChapterPagesFromEpub(it) }.orEmpty()
+        chapterPagesWords = bookUri?.let { extractChapterPagesFromEpub(contentResolver, it) }.orEmpty()
 
         contentTextView = findViewById(R.id.text_book_content)
         currentPageTextView = findViewById(R.id.text_current_page)
@@ -157,47 +156,6 @@ class ActivityReadingBook : ComponentActivity() {
 
         updateUi()
         restartAutoAdvance()
-    }
-
-    private fun extractChapterPagesFromEpub(uri: Uri): List<List<String>> {
-        return try {
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                extractWordsByChapterPageFromStream(inputStream)
-            } ?: emptyList()
-        } catch (_: Exception) {
-            emptyList()
-        }
-    }
-
-    private fun extractWordsByChapterPageFromStream(inputStream: InputStream): List<List<String>> {
-        val chapterPagesWords = mutableListOf<List<String>>()
-
-        ZipInputStream(inputStream).use { zip ->
-            var entry = zip.nextEntry
-            while (entry != null) {
-                val entryName = entry.name.lowercase()
-                if (!entry.isDirectory && (entryName.endsWith(".xhtml") || entryName.endsWith(".html") || entryName.endsWith(".htm"))) {
-                    val rawText = zip.readBytes().toString(Charsets.UTF_8)
-                    val cleanedText = rawText
-                        .replace(Regex("<[^>]+>"), " ")
-                        .replace(Regex("&(rsquo|lsquo|apos);", RegexOption.IGNORE_CASE), "'")
-                        .replace(Regex("&#39;|&#x27;", RegexOption.IGNORE_CASE), "'")
-                        .replace(Regex("&[a-zA-Z#0-9]+;"), " ")
-
-                    val words = cleanedText
-                        .split(Regex("\\s+"))
-                        .filter { it.isNotBlank() }
-
-                    if (words.isNotEmpty()) {
-                        chapterPagesWords.add(words)
-                    }
-                }
-                zip.closeEntry()
-                entry = zip.nextEntry
-            }
-        }
-
-        return chapterPagesWords
     }
 
     private fun getDelayMilliseconds(): Long {
