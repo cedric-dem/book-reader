@@ -10,6 +10,7 @@ import com.fluffycactus.wordperwordreader.R
 import com.fluffycactus.wordperwordreader.domain.Config
 import com.fluffycactus.wordperwordreader.domain.model.extractChapterPagesFromEpub
 
+
 class ActivityStatistics : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,17 +18,37 @@ class ActivityStatistics : ComponentActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_statistics)
 
-        val statisticsTextView = findViewById<TextView>(R.id.text_statistics_content)
+
         val backButton = findViewById<Button>(R.id.button_back_to_reader)
 
+        val numberOfPagesTextView = findViewById<TextView>(R.id.text_number_pages)
+        val numberOfWordsTextView = findViewById<TextView>(R.id.text_number_words)
+        val timeTakenTextView = findViewById<TextView>(R.id.text_time_taken)
+
+        val statisticsTextView = findViewById<TextView>(R.id.text_words_per_page)
+
         val bookUri = intent.getStringExtra(Config.EXTRA_BOOK_URI)?.let { Uri.parse(it) }
+
         val chapterPagesWords = bookUri?.let { extractChapterPagesFromEpub(contentResolver, it) }.orEmpty()
+
+        val totalWords = chapterPagesWords.sumOf { it.size }
+        val timeTaken = getEstimateOfTime(totalWords)
+
+        numberOfPagesTextView.text =  formatInt(chapterPagesWords.size)
+        numberOfWordsTextView.text = formatInt(totalWords)
+        timeTakenTextView.text = convertSecondsToHMS(timeTaken)
 
         statisticsTextView.text = getStatisticsText(chapterPagesWords)
 
         backButton.setOnClickListener {
             finish()
         }
+    }
+
+    private fun getEstimateOfTime(totalWords: Int): Int { // returns number of seconds taken to read all those words
+        //take number of words, counts 190 words per minute, return number of minutes
+        //in future, iterate trough every words, use the computedelay function for exact accurarcy
+        return (60*totalWords/190).toInt()
     }
 
     private fun getStatisticsText(chapterPagesWords: List<List<String>>): String {
@@ -37,8 +58,24 @@ class ActivityStatistics : ComponentActivity() {
 
         return chapterPagesWords
             .mapIndexed { index, words ->
-                getString(R.string.statistics_page_words, index + 1, words.size)
+                getString(
+                    R.string.statistics_page_words,
+                    formatInt(index + 1),
+                    formatInt(words.size)
+                )
             }
             .joinToString(separator = "\n")
+    }
+
+    private fun convertSecondsToHMS(seconds: Int): String {
+        val hours = seconds / 3600
+        val minutes = (seconds % 3600) / 60
+        val secs = seconds % 60
+
+        return String.format("%dh %02dmin %02dsec", hours, minutes, secs)
+    }
+
+    fun formatInt(n: Int): String {
+        return "%,d".format(n).replace(',', ' ')
     }
 }

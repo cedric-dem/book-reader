@@ -15,5 +15,9 @@
     <string name="back_to_reader">Back to reader</string>
     <string name="statistics_empty">No statistics available</string>
     <string name="statistics_summary">Number of pages: %1$d\nPage with the biggest number of words: %2$d (%3$d words)</string>
-    <string name="statistics_page_words">Page %1$d: %2$d words</string>
+    <string name="statistics_page_words">Page %1$s - %2$s words</string>
+    <string name="number_of_pages">Number of Pages</string>
+    <string name="number_of_words">Number of words</string>
+    <string name="time_taken_at_100_speed">Time taken at 100% speed</string>
+    <string name="detailed_statistics">Detailed Statistics</string>
 </resources>
