@@ -8,7 +8,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import com.fluffycactus.wordperwordreader.R
 import com.fluffycactus.wordperwordreader.domain.Config
+import com.fluffycactus.wordperwordreader.domain.model.convertSecondsToHMS
 import com.fluffycactus.wordperwordreader.domain.model.extractChapterPagesFromEpub
+import com.fluffycactus.wordperwordreader.domain.model.formatInt
 
 
 class ActivityStatistics : ComponentActivity() {
@@ -34,7 +36,7 @@ class ActivityStatistics : ComponentActivity() {
         val totalWords = chapterPagesWords.sumOf { it.size }
         val timeTaken = getEstimateOfTime(totalWords)
 
-        numberOfPagesTextView.text =  formatInt(chapterPagesWords.size)
+        numberOfPagesTextView.text = formatInt(chapterPagesWords.size)
         numberOfWordsTextView.text = formatInt(totalWords)
         timeTakenTextView.text = convertSecondsToHMS(timeTaken)
 
@@ -48,7 +50,7 @@ class ActivityStatistics : ComponentActivity() {
     private fun getEstimateOfTime(totalWords: Int): Int { // returns number of seconds taken to read all those words
         //take number of words, counts 190 words per minute, return number of minutes
         //in future, iterate trough every words, use the computedelay function for exact accurarcy
-        return (60*totalWords/190).toInt()
+        return (60 * totalWords / 190).toInt()
     }
 
     private fun getStatisticsText(chapterPagesWords: List<List<String>>): String {
@@ -67,15 +69,5 @@ class ActivityStatistics : ComponentActivity() {
             .joinToString(separator = "\n")
     }
 
-    private fun convertSecondsToHMS(seconds: Int): String {
-        val hours = seconds / 3600
-        val minutes = (seconds % 3600) / 60
-        val secs = seconds % 60
 
-        return String.format("%dh %02dmin %02dsec", hours, minutes, secs)
-    }
-
-    fun formatInt(n: Int): String {
-        return "%,d".format(n).replace(',', ' ')
-    }
 }

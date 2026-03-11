@@ -9,8 +9,8 @@
     <string name="no_preview_available">No preview available</string>
     <string name="epub_read_error">Could not read this EPUB file</string>
     <string name="epub_no_text_found">No readable text found in this EPUB</string>
-    <string name="page_counter">Page : \n%1$d / %2$d</string>
-    <string name="word_counter">Words : \n%1$d / %2$d</string>
+    <string name="page_counter">Page : \n%1$s / %2$s</string>
+    <string name="word_counter">Words : \n%1$s / %2$s</string>
     <string name="speed_counter">Reading speed : \n%1$d%%</string>
     <string name="back_to_reader">Back to reader</string>
     <string name="statistics_empty">No statistics available</string>

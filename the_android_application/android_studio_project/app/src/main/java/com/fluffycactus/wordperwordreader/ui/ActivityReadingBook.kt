@@ -16,6 +16,7 @@ import com.fluffycactus.wordperwordreader.domain.model.DataManager
 import com.fluffycactus.wordperwordreader.R
 import com.fluffycactus.wordperwordreader.domain.Config
 import com.fluffycactus.wordperwordreader.domain.model.extractChapterPagesFromEpub
+import com.fluffycactus.wordperwordreader.domain.model.formatInt
 
 class ActivityReadingBook : ComponentActivity() {
 
@@ -185,11 +186,15 @@ class ActivityReadingBook : ComponentActivity() {
         currentBookLocation.wordNumber = safeWordIndex
 
         contentTextView.text = currentPageWords[safeWordIndex]
-        currentPageTextView.text = getString(R.string.page_counter, currentBookLocation.pageIndex + 1, totalPages)
+        currentPageTextView.text = getString(
+            R.string.page_counter,
+            formatInt(currentBookLocation.pageIndex + 1),
+            formatInt(totalPages)
+        )
         currentWordTextView.text = getString(
             R.string.word_counter,
-            safeWordIndex + 1,
-            currentPageWords.size
+            formatInt(safeWordIndex + 1),
+            formatInt(currentPageWords.size)
         )
         val speedPercent = (currentSpeedFactor * 100).roundToInt()
         currentSpeedTextView.text = getString(R.string.speed_counter, speedPercent)
